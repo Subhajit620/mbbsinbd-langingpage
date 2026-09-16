@@ -1,0 +1,31 @@
+﻿# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Environment Variables
+.env
+server/.env
+client/.env
+client/.env.local
+client/.env.production
+
+# Build Outputs
+dist/
+client/dist/
+
+# Logs
+logs/
+server/logs/
+*.log
+npm-debug.log*
+
+# Uploaded generated PDFs
+server/public/uploads/pdf/*.pdf
+!server/public/uploads/pdf/.gitkeep
+
+# OS / Editor Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

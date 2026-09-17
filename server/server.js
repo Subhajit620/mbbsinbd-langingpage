@@ -136,6 +136,49 @@ app.get('/api/health', (req, res) => {
 app.use('/api/leads', leadRoutes);
 app.use('/api/auth', authRoutes);
 
+// Modal / Direct Inquiry Endpoint
+app.post('/api/submit', async (req, res, next) => {
+  try {
+    const { name, email, phone, country, location, neetScore, passYear, query } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ status: 'error', message: 'Name and email are required.' });
+    }
+
+    const Lead = (await import('./models/Lead.js')).default;
+    const { generateReportId } = await import('./utils/gpaCalculator.js');
+
+    const newLead = new Lead({
+      report_id: generateReportId(),
+      name: String(name).trim(),
+      email: String(email).toLowerCase().trim(),
+      phone: String(phone || 'N/A').trim(),
+      location: String(country || location || '').trim(),
+      query: String(query || 'Modal Inquiry').trim(),
+      neet_score: Number(neetScore) || 0,
+      passing_year: String(passYear || new Date().getFullYear()).trim(),
+      marks_10: { inquiry: true },
+      marks_12: { inquiry: true },
+      calculated_gpa_10: 0,
+      calculated_gpa_12: 0,
+      is_eligible: true,
+      pdf_url: '',
+      submitted_at: new Date()
+    });
+
+    await newLead.save();
+    logger.info(`[Modal Lead] Saved inquiry for: ${newLead.name} (${newLead.email})`);
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Inquiry submitted successfully.',
+      data: { report_id: newLead.report_id }
+    });
+  } catch (err) {
+    logger.error('Modal Inquiry Submit Error:', err);
+    return res.status(500).json({ status: 'error', message: 'Failed to submit inquiry.' });
+  }
+});
+
 // 404 Route Handler
 app.use((req, res, next) => {
   res.status(404).json({

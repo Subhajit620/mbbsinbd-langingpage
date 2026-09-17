@@ -244,12 +244,24 @@ function LandingPage() {
 
       const res = await axios.post('/api/leads/check-eligibility', payload);
       if (res.data.success) {
-        if (typeof window !== 'undefined' && typeof window.oaiq === 'function') {
-          window.oaiq('measure', 'lead_created', {
-            type: 'customer_action',
-            event_id: '6aaa28ea7c7081989add9d2de9a8f7b5'
+        // Track Conversion in Google Tag Manager (GTM)
+        if (typeof window !== 'undefined') {
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            event: 'generate_lead',
+            event_category: 'Eligibility Form',
+            lead_name: formValues.name,
+            lead_email: formValues.email
           });
+
+          // Track Conversion in OpenAI Ads Manager
+          if (typeof window.oaiq === 'function') {
+            window.oaiq('measure', 'lead_created', {
+              type: 'customer_action'
+            });
+          }
         }
+
         navigate('/thank-you', { state: res.data.data });
       }
     } catch (err) {
@@ -284,11 +296,22 @@ function LandingPage() {
       });
 
       if (res.data.status === 'success') {
-        if (typeof window !== 'undefined' && typeof window.oaiq === 'function') {
-          window.oaiq('measure', 'lead_created', {
-            type: 'customer_action',
-            event_id: '6aaa28ea7c7081989add9d2de9a8f7b5'
+        // Track Conversion in Google Tag Manager (GTM)
+        if (typeof window !== 'undefined') {
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            event: 'generate_lead',
+            event_category: 'Modal Inquiry',
+            lead_name: modalFormValues.name,
+            lead_email: modalFormValues.email
           });
+
+          // Track Conversion in OpenAI Ads Manager
+          if (typeof window.oaiq === 'function') {
+            window.oaiq('measure', 'lead_created', {
+              type: 'customer_action'
+            });
+          }
         }
         setModalSuccess(true);
         setTimeout(() => {

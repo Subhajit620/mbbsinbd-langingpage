@@ -357,11 +357,6 @@ function NextStepsTimeline() {
 
 // Generic thank-you shown on direct visits / page refresh (no submission data)
 function DefaultThankYou() {
-  oaiq(
-  "measure",
-  "lead_created",
-  { type: "customer_action" }
-);
   return (
     <ThankYouShell>
       <div className='check-wrapper'>
@@ -411,11 +406,24 @@ function ThankYou() {
   const absolutePdfUrl = pdfUrl ? (pdfUrl.startsWith('http') ? pdfUrl : `${axios.defaults.baseURL || ''}${pdfUrl}`) : '';
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && typeof window.oaiq === 'function') {
-      window.oaiq('measure', 'lead_created', {
-        type: 'customer_action',
-        event_id: '6aaa28ea7c7081989add9d2de9a8f7b5'
+    if (typeof window !== 'undefined') {
+      // Track conversion event for Google Tag Manager (GTM)
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'conversion_thank_you',
+        event_name: 'lead_conversion',
+        lead_name: name,
+        lead_email: email,
+        lead_status: isEligible ? 'eligible' : 'ineligible',
+        report_id: reportId || ''
       });
+
+      // Track conversion event for OpenAI Ads Manager
+      if (typeof window.oaiq === 'function') {
+        window.oaiq('measure', 'lead_created', {
+          type: 'customer_action'
+        });
+      }
     }
   }, []);
 

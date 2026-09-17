@@ -7,7 +7,7 @@ import Dashboard from './pages/dashboard.jsx';
 
 function App() {
   return (
-    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <Router basename="/landing-page" future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/thank-you" element={<ThankYou />} />

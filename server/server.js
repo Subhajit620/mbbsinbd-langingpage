@@ -179,6 +179,19 @@ app.post('/api/submit', async (req, res, next) => {
   }
 });
 
+// Serve Client Static Build if available
+const clientDistPath = path.join(__dirname, '../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use('/landing-page', express.static(clientDistPath));
+  app.use(express.static(clientDistPath));
+  app.get(['/landing-page/*', '/admin', '/admin-login', '/thank-you'], (req, res, next) => {
+    if (req.originalUrl.startsWith('/api') || req.originalUrl.startsWith('/uploads') || req.originalUrl.startsWith('/public')) {
+      return next();
+    }
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
+
 // 404 Route Handler
 app.use((req, res, next) => {
   res.status(404).json({

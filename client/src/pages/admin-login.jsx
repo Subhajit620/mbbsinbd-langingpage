@@ -17,12 +17,18 @@ function AdminLogin() {
 
     try {
       const response = await axios.post('/api/auth/login', { username, password });
-      if (response.data.status === 'success') {
+      if (response.data.status === 'success' || response.data.success) {
         localStorage.setItem('adminToken', response.data.data.token);
         navigate('/admin');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid username or password!');
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err.code === 'ERR_NETWORK' || !err.response) {
+        setError('Cannot connect to server. Please ensure backend is running on VPS and API URL is accessible.');
+      } else {
+        setError(err.message || 'Invalid username or password!');
+      }
     } finally {
       setLoading(false);
     }

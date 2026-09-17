@@ -4,10 +4,10 @@ export const login = async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
-    const ADMIN_USER = 'admin';
-    const ADMIN_PASS = 'aspiringlife2026';
+    const ADMIN_USER = (process.env.ADMIN_USERNAME || process.env.ADMIN_USER || 'admin').trim();
+    const ADMIN_PASS = (process.env.ADMIN_PASSWORD || process.env.ADMIN_PASS || 'aspiringlife2026').trim();
 
-    if (username.trim() !== ADMIN_USER || password !== ADMIN_PASS) {
+    if (!username || !password || username.trim() !== ADMIN_USER || password.trim() !== ADMIN_PASS) {
       return res.status(401).json({
         success: false,
         message: 'Invalid administrator credentials.',
